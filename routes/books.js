@@ -1,7 +1,16 @@
 const express = require('express');
 const { books } = require("../data/books.json")
 const { users } = require("../data/users.json")
+const { getAllBooks, getSingleBooksById, getAllIssuedBooks } = require("../controllers/book-contoller")
 const router = express.Router();
+
+// const BookModel = require("../models/book-model")
+// const UserModel = require("../models/user-model")
+// above is done in just one line
+const { UserModel, BookModel } = require("../models/index");
+const { get } = require('mongoose');
+// const BookModel = require("../models/index")
+// const UserModel = require("../models/index")
 
 /**
  * Route: /books
@@ -10,12 +19,7 @@ const router = express.Router();
  * Access: Public
  * Parameters: None
  */
-router.get("/", (request, response) => {
-  response.status(200).json({
-    success: true,
-    data: books
-  })
-})
+router.get("/", getAllBooks)
 
 
 /**
@@ -25,22 +29,7 @@ router.get("/", (request, response) => {
  * Access: Public
  * Parameters: None
  */
-router.get("/:id", (request, response) => {
-  const { id } = request.params;
-  const book = books.find(book => book.id === id);
-
-  if (!book) {
-    return response.status(404).json({
-      success: false,
-      message: "Book not found"
-    })
-  }
-
-  return response.status(200).json({
-    success: true,
-    data: book
-  })
-})
+router.get("/:id", getSingleBooksById)
 
 
 /**
@@ -51,34 +40,7 @@ router.get("/:id", (request, response) => {
  * Parameters: None
  */
 
-router.get("/issued/by-user", (request, response) => {
-  const usersWithIssuedBooks = users.filter((each) => {
-    if (each.issuedBook) return each;
-  });
-
-  const issuedBooks = [];
-
-  usersWithIssuedBooks.forEach((each) => {
-    const book = books.find((book) => book.id === each.issuedBook);
-
-    book.issuedBy = each.name;
-    book.issuedDate = each.issuedDate;
-    book.returnDate = each.returnDate;
-
-    issuedBooks.push(book);
-  });
-
-  if (issuedBooks.length === 0)
-    return response.status(404).json({
-      success: false,
-      message: "No books issued yet",
-    });
-
-  return response.status(200).json({
-    success: true,
-    data: issuedBooks,
-  });
-});
+router.get("/issued/by-user", getAllIssuedBooks);
 
 /**
  * Route: /books
