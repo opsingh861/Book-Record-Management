@@ -1,7 +1,7 @@
 const express = require('express');
 const { books } = require("../data/books.json")
 const { users } = require("../data/users.json")
-const { getAllBooks, getSingleBooksById, getAllIssuedBooks } = require("../controllers/book-contoller")
+const { getAllBooks, getSingleBooksById, getAllIssuedBooks, addNewBook } = require("../controllers/book-contoller")
 const router = express.Router();
 
 // const BookModel = require("../models/book-model")
@@ -51,25 +51,7 @@ router.get("/issued/by-user", getAllIssuedBooks);
  * data: name,author,genre,publisher,id
  */
 
-router.post("/", (request, response) => {
-  const { data } = request.body
-  if (!data) return response.status(400).json({
-    success: false,
-    message: "Data is not provided by user"
-  })
-
-  const book = books.find((each) => each.id === data.id);
-  if (book) return response.status(401).json({ success: false, message: "Book already exist with this id, please unique id" })
-
-  // const allBooks = [...books, ...data]
-  books.push({ data })
-  return response.status(200).json({
-    success: true,
-    message: "Book successfully added",
-    data: books
-  })
-
-})
+router.post("/", addNewBook)
 
 
 /**
